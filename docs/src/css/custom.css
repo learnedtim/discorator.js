@@ -1,0 +1,148 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #2e8555;
+  --ifm-color-primary-dark: #29784c;
+  --ifm-color-primary-darker: #277148;
+  --ifm-color-primary-darkest: #205d3b;
+  --ifm-color-primary-light: #33925d;
+  --ifm-color-primary-lighter: #359962;
+  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --prism-background-color: #131314!important;
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+html[data-theme='dark'] {
+  --ifm-color-primary: #25c2a0;
+  --ifm-color-primary-dark: #21af90;
+  --ifm-color-primary-darker: #1fa588;
+  --ifm-color-primary-darkest: #1a8870;
+  --ifm-color-primary-light: #29d5b0;
+  --ifm-color-primary-lighter: #32d8b4;
+  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-background-color: #0f0f0f;
+  --ifm-toc-border-color: #222222;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Custom footer, along with the exported class in src/theme*/
+.footer {
+  background-color: #131314;
+  border-style: solid;
+  border-color: #222222;
+  border-width: 1px;
+  border-radius: 10px;
+  margin: 10px;
+  padding: 15px;
+}
+
+/* link colors */
+.a {
+  color: #2e3885;
+}
+
+/* update breadcrumb design */
+.breadcrumbs {
+  background-color: #131314;
+  border-style: solid;
+  border-color: #222222;
+  border-width: 1px;
+  border-radius: 10px;
+  padding: 5px;
+  margin-top: 10px;
+  margin-bottom: 8px;
+  display: inline-block;
+}
+
+.breadcrumbs__link {
+  border-radius: 7px;
+}
+
+/* the navbar is fundemental to docusaurus, but we dont want to show it. therefore hide it from sight.*/
+.navbar {
+  height: 0px;
+  width: 0px;
+  position: absolute;
+  visibility: hidden;
+}
+
+/* custom headings */
+.markdown > h2 {
+  --ifm-h2-font-size: 1.5em;
+  margin-bottom: 0.8em;
+}
+
+.markdown > h3 {
+  --ifm-h3-font-size: 1.2em;
+  margin-top: 0.2em;
+  margin-bottom: 0.7em;
+}
+
+.markdown > h4 {
+  --ifm-h4-font-size: 1em;
+  margin-top: 0.1em;
+  margin-bottom: 0.5em;
+}
+
+/* tables */
+table {
+  border-collapse: separate;
+  border: none;
+  overflow: hidden;
+  border-spacing: 0
+}
+
+table tr {
+  border: none!important;
+  border-bottom: none!important;
+  border-top: none!important;
+  background-color: #0f0f0f
+}
+
+table tr:nth-child(2n) {
+  background-color: #0f0f0f /* fix default markdown */
+}
+
+table td {
+  border: 1px solid #222222;
+  padding: 8px;
+  padding-left: 20px;
+  padding-right: 20px;
+  vertical-align: top;
+}
+
+table th {
+  border: 1px solid #222222;
+  min-width: 100px;
+  padding: 8px;
+  padding-left: 20px;
+  padding-right: 20px;
+  text-align: left;
+}
+
+table thead:first-child tr {
+  background-color: #131314;
+}
+
+table tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+}
+
+table tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
+table tr:first-child th:first-child {
+  border-top-left-radius: 10px;
+}
+
+table tr:first-child th:last-child {
+  border-top-right-radius: 10px;
+}
