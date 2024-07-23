@@ -10,6 +10,6 @@ import { Client, IntentBits, TextChannel, generateNonce } from '../index.js'
 
     await client.on('INTERACTION_CREATE', async (interaction) => {
         console.log(interaction)
+        interaction.reply('Pong!')
     })
-    
 })();
