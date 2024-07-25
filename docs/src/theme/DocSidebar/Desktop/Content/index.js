@@ -40,7 +40,7 @@ export default function DocSidebarDesktopContent({path, sidebar, className}) {
         <div style={{
           textAlign: 'center',
         }}>
-          ConcordJS
+          discoratorjs
         </div>
         <DocSidebarItems items={sidebar} activePath={path} level={1} />
       </ul>

@@ -9,18 +9,18 @@ import Interaction from "../modules/server/ServerInteraction.js";
  */
 let closeCodes = {
     4000: [true, "Unknown Discord error"],
-    4001: [true, "Unknown opcode (internal error, please make a bug report at https://github.com/learnedtim/concordjs)"],
+    4001: [true, "Unknown opcode (internal error, please make a bug report at https://github.com/learnedtim/discoratorjs)"],
     4002: [true, "Decode error"],
     4003: [true, "Not authenticated"],
     4004: [false, "Authentication failed"],
     4005: [true, "Already authenticated"],
-    4007: [true, "Invalid sequence number (internal error, please make a bug report at https://github.com/learnedtim/concordjs)"],
+    4007: [true, "Invalid sequence number (internal error, please make a bug report at https://github.com/learnedtim/discoratorjs)"],
     4008: [true, "Rate limited"],
     4009: [true, "Session timeout"],
     4010: [false, "Invalid shard"],
     4011: [false, "Sharding required"],
-    4012: [false, "Invalid version (internal error, please make a bug report at https://github.com/learnedtim/concordjs)"],
-    4013: [false, "Invalid intent(s) (potential internal error, please make a bug report at https://github.com/learnedtim/concordjs)"],
+    4012: [false, "Invalid version (internal error, please make a bug report at https://github.com/learnedtim/discoratorjs)"],
+    4013: [false, "Invalid intent(s) (potential internal error, please make a bug report at https://github.com/learnedtim/discoratorjs)"],
     4014: [false, "Disallowed intent(s)"],
 }
 

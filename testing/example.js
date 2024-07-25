@@ -1,4 +1,4 @@
-import { Client, IntentBits, TextChannel, generateNonce } from '../concord/index.js'
+import { Client, IntentBits, TextChannel, generateNonce } from '../discorator/index.js'
 
 (async function() {
     const client = await new Client({ 

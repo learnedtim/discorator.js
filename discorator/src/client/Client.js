@@ -55,7 +55,7 @@ export default class Client extends EventEmitter {
             if (!('twoCaptchaEndpoint' in this.sysArgs)) this.sysArgs.twoCaptchaEndpoint = 'https://api.2captcha.com/createTask'
             if (!('discordLoginEndpoint' in this.sysArgs)) this.sysArgs.discordLoginEndpoint = 'https://discord.com/api/v9/auth/login'
             if (this.discordApiBase.charAt(this.discordApiBase.length - 1) == '/') this.discordApiBase = this.discordApiBase.slice(0, -1)
-            if (this.sysArgs.userType == 'bot') this.#usrAgent = 'DiscordBot (https://github.com/learnedtim/concordjs, 1.0.0)'
+            if (this.sysArgs.userType == 'bot') this.#usrAgent = 'DiscordBot (https://github.com/learnedtim/discoratorjs, 1.0.0)'
 
             return this;
         })();

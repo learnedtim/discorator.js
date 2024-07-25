@@ -1,7 +1,7 @@
 {
-  "name": "concordjs",
+  "name": "discorator.j",
   "version": "0.1.0",
-  "description": "A simple Discord API Wrapper for both bots and user accounts.",
+  "description": "A simple Discord API Wrapper for user and bot.",
   "main": "index.js",
   "type": "module",
   "exports": {
@@ -20,5 +20,13 @@
     "chalk": "^5.3.0",
     "ws": "^8.17.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/learnedtim/discorator.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/learnedtim/discorator.js/issues"
+  },
+  "homepage": "https://github.com/learnedtim/discorator.js#readme"
 }
