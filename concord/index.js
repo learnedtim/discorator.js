@@ -1,7 +1,7 @@
 export { default as Client }                   from './src/client/Client.js'
 export { default as Gateway }                  from './src/client/Gateway.js'                // publicly available, but is mainly used internally
 export { default as StandardEventListeners }   from './src/client/StandardEventListeners.js' // publicly available, but is mainly used internally
-export { default as ClientInteraction }        from './src/modules/client/ClientInteraction.js'
+export { default as ClientInteraction }        from './src/modules/user/ClientInteraction.js'
 export { default as ServerApplicationCommand } from './src/modules/server/ServerApplicationCommand.js'
 export { default as ServerInteraction }        from './src/modules/server/ServerInteraction.js'
 export { default as Channel }                  from './src/modules/shared/Channel.js'

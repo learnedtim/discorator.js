@@ -3,7 +3,7 @@ module.exports = {
     Client: require('./src/client/Client.js'),
     Gateway: require('./src/gateway/Gateway.js'),
     StandardEventListeners: require('./src/gateway/StandardEventListeners.js'),
-    ClientInteraction: require('./src/modules/client/ClientInteraction.js'),
+    ClientInteraction: require('./src/modules/user/ClientInteraction.js'),
     ServerApplicationCommand: require('./src/modules/server/ServerApplicationCommand.js'),
     ServerInteraction: require('./src/modules/server/ServerInteraction.js'),
     Channel: require('./src/modules/shared/Channel.js'),
