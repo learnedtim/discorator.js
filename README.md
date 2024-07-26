@@ -17,7 +17,7 @@ npm i discorator.js
 ## Example
 You can check the example files in the `testing` directory for more details, however the following shows how one would sign into Discord:
 ```js
-import { Client, IntentBits, TextChannel, generateNonce } from '../discorator/index.js'
+import { Client, IntentBits, TextChannel, generateNonce } from 'discorator.js'
 
 (async function() {
     const client = await new Client({ 
