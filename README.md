@@ -29,12 +29,13 @@ import { Client, IntentBits, TextChannel, generateNonce } from 'discorator.js'
     // await client.loginByCredentials({email: 'h@h.com', password: 'h', captchaToken: '2captcha-token'}) // credential login (todo: totp support)
 
     // send command to a channel
-    let channel = await new TextChannel(client).fetch('channel_id')
-    let res = await channel.emitCommand('ping', 'id')
+    let channel = await new TextChannel(client).fetch('channel_id') // create a new channel and initialize it
+    let res = await channel.emitCommand('ping', 'id') // issue a command (name and application id), subcommand and args are under the 'options' argument, although they need to be manually constructed at the moment.
     
 })();
 ```
 
 ## Contribution
 We're looking for contributors! Pull requests, Issues, and Documentation updates are all heavily encouraged.
+We're hoping to finish implementing all methods, classes and endpoints in a while.
 
