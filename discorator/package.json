@@ -1,6 +1,6 @@
 {
-  "name": "discorator.j",
-  "version": "0.1.0",
+  "name": "discorator.js",
+  "version": "0.1.1",
   "description": "A simple Discord API Wrapper for user and bot.",
   "main": "index.js",
   "type": "module",
