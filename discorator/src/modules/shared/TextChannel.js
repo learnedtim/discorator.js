@@ -47,7 +47,7 @@ export default class TextChannel extends Channel {
         if (!this.id) throw new Error('Cannot make a request without a initialized channel')
 
         if (typeof message === 'string') message = new Message(this.client).setContent(message);
-        if (typeof message === 'object' && message instanceof Message === false) message = new Message(this.client, message);
+        if (typeof message === 'object' && !(message instanceof Message)) message = new Message(this.client, message);
 
         if (message instanceof Message) {
             message.clean()
@@ -64,7 +64,7 @@ export default class TextChannel extends Channel {
 
     /**
      * Easy way to create a DM channel with a user, does not work with guilds and this channel may not be initialized
-     * @@deprecated DO NOT USE - Incorrect usage will lead to Discord permamently flagging your account
+     * @deprecated DO NOT USE - Incorrect usage will lead to Discord permamently flagging your account
      * @param {Number} userId 
      */
     async createDM(userId) {
@@ -125,7 +125,7 @@ export default class TextChannel extends Channel {
      * Client-only method
      * Emits a command to the channel
      * @param {Number} commandId
-     * @param {Number|User} bot -- application id or the Bot User object
+     * @param {string} bot -- application id or the Bot User object
      * @param {Object} options -- options to send with the command
      */
     async emitCommand(commandName, bot, options=[]) {

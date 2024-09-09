@@ -67,7 +67,7 @@ export default class Gateway extends EventEmitter {
         this.ws.on("error", this.onError.bind(this));
         await this.hbReady; // wait for first heartbeat to be sent
         // identify
-        this.send(2, {
+        await this.send(2, {
             "token": this.#token,
             "intents": this.intents,
             "properties": {
@@ -106,7 +106,7 @@ export default class Gateway extends EventEmitter {
         await this.hbReady; // wait for Hello to be sent
 
         // send resume
-        this.send(6, {
+        await this.send(6, {
             "token": this.#token,
             "session_id": this.sessionId,
             "seq": this.sequence
@@ -130,7 +130,7 @@ export default class Gateway extends EventEmitter {
      */
     async send(op, data) {
         // temp
-        this.ws.send(JSON.stringify({ op, d: data}))
+        await this.ws.send(JSON.stringify({ op, d: data}))
     }
 
     /**
@@ -152,7 +152,7 @@ export default class Gateway extends EventEmitter {
         switch (msg.op) {
             case 0:
                 // Event receive
-                // incase of READY, resolve connectReady
+                // in case of READY, resolve connectReady
                 if (msg.t === "READY") {
                     this.resumeGatewayUrl = msg.d.resume_gateway_url
                     this.sessionId = msg.d.session_id
@@ -175,7 +175,7 @@ export default class Gateway extends EventEmitter {
                 break;
             case 1:
                 // Force Heartbeat
-                this.send(1, null, this.sequence)
+                await this.send(1, null, this.sequence)
                 break;
             case 10:
                 // Hello
@@ -220,7 +220,7 @@ export default class Gateway extends EventEmitter {
         if (this.alive == false) { console.log("Socket connection closed."); return }
         if (this.alive == true)  console.log("Connection closed uncleanly with exit code: " + msg)
 
-        this.resume(msg)
+        await this.resume(msg)
     }
 
     /**

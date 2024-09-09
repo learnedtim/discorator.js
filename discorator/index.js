@@ -14,4 +14,3 @@ export { default as MessageFlags }             from './src/util/MessageFlags.js'
 export { default as registerCommands }         from './src/util/registerCommands.js'
 export { default as Token }                    from './src/util/token.js'
 export { default as generateNonce }            from './src/util/Nonce.js'
-

@@ -101,13 +101,13 @@ export default class Client extends EventEmitter {
         }
 
         if (!typeof this.#token == 'string') throw new Error('No token was provided. ..aborting')
-        if ('data' in data) console.warn(chalk.bgYellow(' WARN ') + chalk.yellow(' Property "data" was provided, but does not exist. Did you mean "payload"?'))
+        if ('data' in data) console.warn(chalk.bgYellow(' WARN ') + chalk.yellow(' Property "data.data" was provided, but is not valid. Did you mean "data.payload"?'))
         if (!'method' in data) throw new Error('No method was provided. ..aborting')
         if (!('endpoint' in data)) throw new Error('No endpoint was provided. ..aborting')
         if (data.endpoint.charAt(0) == '/') data.endpoint = data.endpoint.slice(1)
         data.method = data.method.toLowerCase()
         if (data.method != 'get' && data.method != 'post' && data.method != 'put' && data.method != 'delete') throw new Error('Invalid method provided. ..aborting')
-        if (data.method == 'get' && 'payload' in data) throw new Error('GET requests cannot have a payload. You may need to use parameters instead. ..aborting')
+        if (data.method == 'get' && 'payload' in data) throw new Error('GET requests cannot contain a payload. You may need to use parameters instead. ..aborting')
 
         let request = {}
         if ('method'   in data)  request.method  = data.method

@@ -6,7 +6,7 @@ import { Client, IntentBits, TextChannel, generateNonce } from '../discorator/in
         userType: 'user',
         intents: [IntentBits.Guilds, IntentBits.Direct_Messages, IntentBits.Message_Content, IntentBits.Guild_Messages]
     });
-    await client.loginByToken('token')
+    client.loginByToken('token')
 
     // send command to a channel
     let channel = await new TextChannel(client).fetch('channel_id')
