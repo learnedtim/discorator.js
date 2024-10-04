@@ -56,10 +56,10 @@ export default class TextChannel extends Channel {
 
         let res = await this.client.apiRequest({
             method: "POST",
-            endpoint: `/channels/${this.id}/messages`,
+            endpoint: `channels/${this.id}/messages`,
             payload: message
         })
-        console.log(res)
+        //console.log(res)
     }
 
     /**

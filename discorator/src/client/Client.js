@@ -1,9 +1,10 @@
 import chalk     from 'chalk';
-import axios     from 'axios';
-import Token from '../util/token.js';
+import Token from '../util/Token.js';
 import Gateway from './Gateway.js';
 import { calculateIntentBits } from '../util/intents.js';
 import { EventEmitter } from 'node:events';
+
+class NetworkError extends Error {}
 
 /** Handles credentials and API requests. */
 export default class Client extends EventEmitter {
@@ -62,20 +63,40 @@ export default class Client extends EventEmitter {
     }
 
     /**
+     * API Error catcher (e.g. Request Denied or any other 4xx/5xx error)
+     * @param {*} response 
+     * @returns {boolean} ok -- Whether or not the request was successful.
+     * @returns {boolean} retry -- Whether or not the request should be retried.
+     * @returns {string} error -- The error message
+     * @returns {[number]} retryIn -- OPTIONAL
+     */
+    async #apiErrorCatcher(response)  {
+        let retry   = null
+        let error   = null
+        let retryIn = null
+        let updatedOptions = null
+        if (response.ok) return { ok: true, retry: retry, error: error, retryIn: retryIn, updatedOptions: updatedOptions }
+        // catch here
+
+        return { ok: false, retry: retry, error: error, retryIn: retryIn, updatedOptions: updatedOptions }
+    }
+
+    /**
      * Base Api Request
      * @param {Object} data 
-     * @param {string} data.method -- The HTTP method to use for the request. (get/post/put/delete/patch)
+     * @param {[get|post|put|delete|patch]} data.method -- The HTTP method to use for the request. (get/post/put/delete/patch)
      * @param {string} data.endpoint -- The endpoint to send the request to.
      * @param {Object} [data.headers] -- The headers to send with the request.
      * @param {Object} [data.payload] -- The payload to send with the request.
      * @param {Object} [data.params] -- The parameters to send with the request.
      * @param {boolean} [data.auth=true] -- Whether or not to include the Authorization header in the request. (default: true)
      * 
-     * @returns 
+     * @returns {Promise} -- The response from the API.
      */
     async apiRequest(data) {
         //console.log(data)
 
+        // this function exists because Axios sucks more than my parents' marriage (in certain aspects)
         let findData = (apiResponse) => {
             let result = []
             let done   = false
@@ -94,94 +115,75 @@ export default class Client extends EventEmitter {
                 count++
             }
             //console.log(result)
-            if (result == {}) throw new Error("No 'data' key was found in the response. ..aborting")
+            if (Object.keys(result).length === 0) throw new Error("No 'data' key was found in the response. ..aborting");
             // get highest index in result array
             result = result.reduce((max, current) => current.index > max.index ? current : max, result[0]);
             return result
         }
 
-        if (!typeof this.#token == 'string') throw new Error('No token was provided. ..aborting')
+        if (!(typeof this.#token == 'string')) throw new Error('No token was provided. ..aborting')
         if ('data' in data) console.warn(chalk.bgYellow(' WARN ') + chalk.yellow(' Property "data.data" was provided, but is not valid. Did you mean "data.payload"?'))
-        if (!'method' in data) throw new Error('No method was provided. ..aborting')
+        if (!('method' in data)) throw new Error('No method was provided. ..aborting')
         if (!('endpoint' in data)) throw new Error('No endpoint was provided. ..aborting')
         if (data.endpoint.charAt(0) == '/') data.endpoint = data.endpoint.slice(1)
         data.method = data.method.toLowerCase()
         if (data.method != 'get' && data.method != 'post' && data.method != 'put' && data.method != 'delete') throw new Error('Invalid method provided. ..aborting')
         if (data.method == 'get' && 'payload' in data) throw new Error('GET requests cannot contain a payload. You may need to use parameters instead. ..aborting')
 
-        let request = {}
-        if ('method'   in data)  request.method  = data.method
-        if ('endpoint' in data)  request.url     = `${this.discordApiBase}/${data.endpoint}`
-        if ('headers'  in data)  { request.headers = data.headers } else request.headers = {}
-        if ('payload'  in data)  request.data    = data.payload
-        if ('params'   in data)  request.params  = data.params
-        if (!('auth'    in data && data.auth == false)) request.headers["Authorization"] = this.#token
-        if (!('auth'    in data && data.auth == false)) request.headers["User-Agent"]    = this.#usrAgent
+        let options = {}
+        if ('method'   in data)  options.method  = data.method
+        if ('headers'  in data)  { options.headers = data.headers } else options.headers = {}
+        if ('payload'  in data)  options.body    = data.payload
+        if ('params'   in data)  options.params  = data.params
+        if (!('auth'    in data && data.auth == false)) options.headers["Authorization"] = this.#token
+        if (!('auth'    in data && data.auth == false)) options.headers["User-Agent"]    = this.#usrAgent
+        if (!('auth'    in data && data.auth == false)) options.headers["Content-Type"]    = 'application/json'
         //console.log(request.url)
         //console.log(request)
 
         // lower request size and potential for errors by removing functions from the payload
-        if ('data' in request) {
-            for (let key in request.data) {
-                if (typeof request.data[key] == 'function') delete request.data[key]
+        if ('data' in options) {
+            for (let key in options.data) {
+                if (typeof options.data[key] == 'function') delete options.data[key]
             }
         }
 
-        let resolved = false
-        let response;
-        let loopCount = 0
-        while (resolved == false && loopCount < this.sysArgs.maxGuardedLoops) {
+        // change body to string
+        if ('body' in options) options.body = JSON.stringify(options.body)
+
+        // Base Request
+        const request = async (options) => {
+            let res;
             try {
-                //console.log('start')
-                response = await axios(request)
-                //console.log('response')
-                response = findData(response)
-                resolved = true
-                //console.log('RETURNED')
-                return response;
-            } catch (err) {
-                console.log(JSON.stringify(err))
-
-                // if the request fails, find out why and return that to the user, OR solve it (depending on the problem), and retry the request.
-                let internallySolved = false
-                if (internallySolved == false && loopCount < this.sysArgs.maxGuardedLoops - 1) if (err.response.status == 400 && err?.response?.data?.captcha_sitekey) return err
-                if (internallySolved == false && loopCount < this.sysArgs.maxGuardedLoops - 1) if (err.response.status == 401 && this.sysArgs.catchAuthErrors == true) {
-                    const testRequest = await axios({
-                        method: 'get',
-                        url: `${this.discordApiBase}/users/@me`,
-                        headers: {
-                            'Authorization': this.#token,
-                            'User-Agent': this.#usrAgent
-                        }
-                    })
-                    if (testRequest.status == 200) throw new Error({response: err, status: 'Requested endpoint is unavailable with specified (valid) token. ..aborting'})
-                    throw new Error({response: err, status: 'API request failed: 402 authentication error.'})
-                }
-                if (internallySolved == false && loopCount < this.sysArgs.maxGuardedLoops - 1) if (err.response.status == 429) if (this.sysArgs.autoRetry == true) {
-                    let timeRemaining = parseInt(err.response.data.retry_after) + 1
-                    console.log(timeRemaining)
-
-                    if (timeRemaining > this.sysArgs.maxRlRetryTime) throw new Error({response: err, status: 'Rate limit exceeded. ..aborting'})
-                    console.log('test 1')
-                    if (this.sysArgs.verbose == true) console.log(chalk.yellow(`Rate limit exceeded. Retrying in ${timeRemaining} seconds.`))
-                    console.log('test 2')
-
-                    await new Promise(r => setTimeout(r, timeRemaining * 1000));
-                    console.log('passed')
-                    internallySolved = true
-                }
-                if (internallySolved == false && loopCount < this.sysArgs.maxGuardedLoops) if (err.response.status == 401) throw new Error({response: err, status: 'API request failed: 401 authentication error.'})
-                if (internallySolved == false && loopCount < this.sysArgs.maxGuardedLoops) if (err.response.status == 400) {
-                    // check if this is a loginLocation error
-                    if ("ACCOUNT_LOGIN_VERIFICATION_EMAIL" == err?.response?.data?.errors?.login?._errors?.code) throw new Error({response: err, status: 'Account login verification email required. ..aborting'})
-                }
-                if (internallySolved == false) throw new Error(err)
+                res = await fetch(`${this.discordApiBase}/${data.endpoint}`, options)
+            } catch(err) {
+                console.log(err)
+                // Network Errors (e.g. unreachable server)
+                throw new NetworkError(err) // temporary
             }
-            //console.log('RETRYING')
+            return res;
+        }   
+
+        let response;
+        let solved = false
+        let loopCount = 0
+        while (solved == false && loopCount < this.sysArgs.maxGuardedLoops) {
+            console.log(options)
+            response = await request(options) // network error? maybe implement this later, but for now the library will just throw an error.
+            console.log(response)
+
+            let httpCheck = await this.#apiErrorCatcher(response) // DiscordAPI error handling
+            console.log(httpCheck)
+            if (httpCheck.ok == true) return response.json() // success
+            if (httpCheck.updatedOptions) options = httpCheck.updatedOptions
+            if (httpCheck.retry == null) throw new Error(httpCheck.error)
+            if (httpCheck.retryIn) { 
+                await new Promise(r => setTimeout(r, httpCheck.retryIn * 1000 + 1000))
+            }
             loopCount++
+            // (redo request)
         }
-        //console.log('resolved')
-        if (resolved == true) return response;
+        return response;
     } 
 
     /**
@@ -191,7 +193,7 @@ export default class Client extends EventEmitter {
      * @param {string} args.password -- The password to use for the login.
      * @param {string} args.captchaToken -- The captcha token to use for the login.
      * @param {string} args.totpToken -- The TOTP token to use for the login.
-     * @returns 
+     * @returns {Promise<json>}
      */
     async loginByCredentials(args) {
         let token = await new Token(this)
@@ -209,7 +211,7 @@ export default class Client extends EventEmitter {
     /**
      * 
      * @param {string} token -- The token to use for the login; without a prefix like 'Bot' or 'Bearer'. 
-     * @returns {boolean} -- whether or not succesful. Access the token with this.getToken()
+     * @returns {Promise<json>} -- whether or not succesful. Access the token with this.getToken()
      */
     async loginByToken(token) {
         if (!token) throw new Error('No token was provided. ..aborting')
