@@ -14,6 +14,7 @@ import Interaction from "../modules/server/ServerInteraction.js";
  * @see https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes
  */
 let closeCodes = {
+    1006: [true, "Connection closed without a final close frame"],
     4000: [true, "Unknown Discord error"],
     4001: [true, "Unknown opcode (internal error, please make a bug report at https://github.com/learnedtim/discoratorjs)"],
     4002: [true, "Decode error"],
@@ -94,7 +95,6 @@ export default class Gateway extends EventEmitter {
      * @param {Boolean} reIdentify -- whether to reidentify
      */
     async resume(closeCode, reIdentify = false) {
-        console.log('RESUME ISSUED WEEWOOWEEWOO')
         // If close code is unknown, reconnect. If one has been given, check if it allows for a reconnect
         if (closeCodes[closeCode]) {
             if (closeCodes[closeCode][0] == false) throw new Error("Reconnection failed: " + closeCodes[closeCode][1])
@@ -132,7 +132,6 @@ export default class Gateway extends EventEmitter {
      * Close the connection
      */
     async close(invalidateSession = false) {
-        //('FUNCTION CLOSE ISSUED WEEWOOWEEWOO')
         if (!this.ws) throw new Error("No connection to close");
         this.alive = false;
         if (invalidateSession) {
