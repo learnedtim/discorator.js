@@ -12,5 +12,5 @@ export { default as IntentBits }               from './src/util/intents.js'
 export { EventToIntent, calculateIntentBits }  from './src/util/intents.js'      // publicly available, but is mainly used internally
 export { default as MessageFlags }             from './src/util/MessageFlags.js' // publicly available, but is mainly used internally
 export { default as registerCommands }         from './src/util/registerCommands.js'
-export { default as Token }                    from './src/util/token.js'
+export { default as Token }                    from './src/util/Token.js'
 export { default as generateNonce }            from './src/util/Nonce.js'
