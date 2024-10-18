@@ -4,17 +4,17 @@ import EventEmitter from "node:events";
 import Interaction from "../modules/server/ServerInteraction.js";
 
 // Current issues:
-// -> Reconnects are not working properly, well they work, they just disconnect after heartbeat > server requests heartbeat > client sends heartbeat > server acks > server disconnects
-//    why is this happening?
 // -> implement reIdentify resume mode
 // -> proper disconnecting
 // -> handle missed ACKs (must disconnect with any code besides 1000/1001)
+// will refactor in the future to allow sharding 
 
 // whether to reconnect for each close code
 /**
  * @see https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes
  */
 let closeCodes = {
+    1006: [true, "Connection closed without a final close frame"],
     4000: [true, "Unknown Discord error"],
     4001: [true, "Unknown opcode (internal error, please make a bug report at https://github.com/learnedtim/discoratorjs)"],
     4002: [true, "Decode error"],
@@ -95,12 +95,11 @@ export default class Gateway extends EventEmitter {
      * @param {Boolean} reIdentify -- whether to reidentify
      */
     async resume(closeCode, reIdentify = false) {
-        console.log('RESUME ISSUED WEEWOOWEEWOO')
         // If close code is unknown, reconnect. If one has been given, check if it allows for a reconnect
         if (closeCodes[closeCode]) {
             if (closeCodes[closeCode][0] == false) throw new Error("Reconnection failed: " + closeCodes[closeCode][1])
         } else {
-            if (this.client.sysArgs.verbose == true) console.log("Reconnection failed: Unknown close code")
+            throw new Error("Reconnection failed: Unknown close code")
         }
 
         // Prepare promise for Hello
@@ -112,15 +111,15 @@ export default class Gateway extends EventEmitter {
         await this.exitHeartbeat()
         delete this.ws;
         delete this.hb;
-        console.log(this.resumeGatewayUrl)
+        //console.log(this.resumeGatewayUrl)
         this.ws = new WebSocket(this.resumeGatewayUrl);
         this.ws.on("open", this.onOpen.bind(this));
         this.ws.on("message", this.onMessage.bind(this)); 
         this.ws.on("close", this.onClose.bind(this));
         this.ws.on("error", this.onError.bind(this));
-        console.log('pre resume')
+        //console.log('pre resume')
         await this.hbReady; // wait for Hello to be sent and heartbeat to be established
-        console.log('resume sent')
+        //console.log('resume sent')
         // send resume
         await this.send(6, {
             "token": this.#token,
@@ -133,7 +132,6 @@ export default class Gateway extends EventEmitter {
      * Close the connection
      */
     async close(invalidateSession = false) {
-        console.log('FUNCTION CLOSE ISSUED WEEWOOWEEWOO')
         if (!this.ws) throw new Error("No connection to close");
         this.alive = false;
         if (invalidateSession) {
@@ -150,7 +148,7 @@ export default class Gateway extends EventEmitter {
      */
     async send(op, data) {
         // temp
-        console.log('send:', { op, d: data})
+        //console.log('send:', { op, d: data})
         await this.ws.send(JSON.stringify({ op, d: data}))
     }
 
@@ -169,9 +167,9 @@ export default class Gateway extends EventEmitter {
     async onMessage(msg, isBinary) {
         msg = isBinary ? msg : msg.toString();
         msg = JSON.parse(msg);
-        console.log('receive', msg)
+        //console.log('receive', msg)
         if (msg.s !== null) this.sequence = msg.s;
-        console.log(this.sequence)
+        //console.log(this.sequence)
         switch (msg.op) {
             case 0:
                 // Event receive
@@ -267,7 +265,7 @@ export default class Gateway extends EventEmitter {
             do {
                 await new Promise(resolve => setTimeout(resolve, this.hbInterval));
                 await this.send(1, this.sequence)
-                console.log('loop heartbeat sent' + Date.now().toString())
+                //console.log('loop heartbeat sent' + Date.now().toString())
             } while (this.alive && this.exitHeartbeat == resolve);
 
             resolve()
