@@ -14,6 +14,8 @@ import Interaction from "../modules/server/ServerInteraction.js";
  * @see https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes
  */
 let closeCodes = {
+    1000: [true, 'Unknown error'],
+    1001: [true, 'Unknown error'],
     1006: [true, "Connection closed without a final close frame"],
     4000: [true, "Unknown Discord error"],
     4001: [true, "Unknown opcode (internal error, please make a bug report at https://github.com/learnedtim/discoratorjs)"],
@@ -102,6 +104,11 @@ export default class Gateway extends EventEmitter {
             throw new Error("Reconnection failed: Unknown close code")
         }
 
+        // If WS is active, close it
+        if (this.ws.readyState === WebSocket.OPEN) {
+            this.close(false)
+        }
+
         // Prepare promise for Hello
         this.hbReady = new Promise((resolve) => {
             this.hbResolve = resolve
@@ -132,6 +139,7 @@ export default class Gateway extends EventEmitter {
      * Close the connection
      */
     async close(invalidateSession = false) {
+        console.log('client initiated disconnect')
         if (!this.ws) throw new Error("No connection to close");
         this.alive = false;
         if (invalidateSession) {
@@ -167,7 +175,7 @@ export default class Gateway extends EventEmitter {
     async onMessage(msg, isBinary) {
         msg = isBinary ? msg : msg.toString();
         msg = JSON.parse(msg);
-        //console.log('receive', msg)
+
         if (msg.s !== null) this.sequence = msg.s;
         //console.log(this.sequence)
         switch (msg.op) {
